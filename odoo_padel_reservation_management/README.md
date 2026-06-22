@@ -1,182 +1,442 @@
 # Odoo Padel Reservation Management
 
-Módulo de Odoo para gestionar reservas de pistas de pádel desde el sitio web, el portal del cliente y el backend interno.
+Custom module for **Odoo 19 / Odoo.sh** designed to manage padel court bookings from the backend, customer portal, and public website.
 
-El módulo está pensado para instalaciones que necesitan publicar disponibilidad online, bloquear horarios, gestionar tarifas por duración y franja horaria, crear reservas internas y vincular las reservas con ventas, pagos, facturación y devoluciones.
+The module allows managing courts, pricing rules, availability, manual bookings, online bookings, payments, invoicing, customer portal access, cancellations, refunds, and internal court planning.
 
-## Características principales
+## General Information
 
-- Publicación de una página web de reserva de pistas de pádel.
-- Consulta de disponibilidad por fecha, pista, duración y hora.
-- Creación de reservas online con bloqueo temporal mientras el cliente completa el pago.
-- Liberación automática de reservas web pendientes de pago mediante cron.
-- Gestión interna de reservas desde el backend de Odoo.
-- Planning interno por pistas.
-- Gestión de pistas activas/inactivas.
-- Bloqueo de pistas por mantenimiento, eventos u otros motivos.
-- Gestión de tarifas por duración y franjas horarias.
-- Reservas recurrentes desde asistente interno.
-- Área de portal para que el cliente consulte sus reservas de pádel.
-- Solicitud y cancelación de reservas desde portal según el flujo configurado.
-- Integración con pedidos de venta, facturas y pagos.
-- Registro de pagos manuales mediante asistente interno.
-- Soporte para preparación de devoluciones Redsys desde la reserva.
-- Grupos de seguridad para usuario y administrador de pádel.
+- **Technical name:** `odoo_padel_reservation_management`
+- **Version:** `19.0.1.0.0`
+- **Author:** RayTugah
+- **License:** LGPL-3
+- **Compatibility:** Odoo 19 / Odoo.sh
+- **Purpose:** Padel court booking management
 
-## Requisitos
+## Main Features
 
-Este módulo está preparado para Odoo 19 según el manifiesto incluido.
+### Court Management
 
-Dependencias declaradas:
+The module allows creating and managing padel courts from Odoo.
 
-- `base`
-- `mail`
-- `calendar`
-- `website`
-- `portal`
-- `sale`
-- `website_sale`
-- `payment`
-- `account`
-- `point_of_sale`
+Each court can be configured with:
 
-También requiere que el entorno de Odoo tenga configurado correctamente el sitio web, los métodos de pago y, si se van a utilizar devoluciones online, el proveedor de pago compatible con Redsys.
+- Court name.
+- Active/inactive status.
+- Website booking availability.
+- Display order.
+- Internal planning and availability information.
 
-## Instalación
+## Padel Bookings
 
-1. Copiar la carpeta `odoo_padel_reservation_management` dentro del directorio de addons de Odoo.
-2. Reiniciar el servidor de Odoo.
-3. Actualizar la lista de aplicaciones.
-4. Buscar el módulo **Odoo Padel Reservation Management** o `odoo_padel_reservation_management`.
-5. Instalar el módulo.
+The module includes a dedicated padel booking model.
 
-En Odoo.sh, se recomienda añadir el módulo al repositorio Git del proyecto, hacer commit de los cambios y desplegar en una rama de pruebas antes de pasarlo a producción.
+Each booking includes:
 
-## Configuración inicial
+- Booking number.
+- Booking name.
+- Linked customer, if available.
+- Phone number.
+- Email.
+- Court.
+- Start date and time.
+- End date and time.
+- Duration.
+- Amount.
+- Status.
+- Origin.
+- Sales order.
+- Invoice.
+- Incoming payment.
+- Payment transaction.
+- Refund transaction.
+- Credit note.
+- Outgoing refund payment.
+- Chatter messages and traceability.
 
-Después de instalar el módulo:
+## Booking Statuses
 
-1. Revisar los permisos de usuario y asignar los grupos correspondientes.
-2. Crear las pistas de pádel desde el menú de configuración del módulo.
-3. Crear las tarifas aplicables por duración y franja horaria.
-4. Revisar los parámetros de configuración:
-   - Hora de apertura.
-   - Hora de cierre.
-   - Intervalo del planning.
-   - Duraciones permitidas.
-   - Minutos de bloqueo de reservas pendientes de pago.
-   - Zona horaria.
-   - URL de condiciones de reserva y cancelación, si se desea mostrar en el portal.
-5. Configurar el producto de reserva de pista si se desea ajustar su nombre, impuestos o cuentas contables.
-6. Revisar el flujo de pago web en Odoo.
-7. Probar una reserva completa en entorno de pruebas antes de activarlo públicamente.
+Bookings can have the following statuses:
 
-## Uso
+- Draft.
+- Pending payment.
+- Confirmed.
+- Finished.
+- Cancelled.
+- No-show.
 
-### Reserva web
+The **Draft** status is intended for internal editing. The system allows returning a booking to draft in order to edit it, but prevents it from being left permanently in that state without changing it afterwards to an operational status.
 
-El cliente puede acceder a la página de reserva de pádel, seleccionar fecha, duración, pista y hora disponible. Si la reserva tiene importe, el sistema crea una reserva pendiente de pago y mantiene el hueco bloqueado durante el tiempo configurado.
+## Internal Planning
 
-### Gestión interna
+The module includes an internal planning view for staff.
 
-Los usuarios internos pueden:
+Features:
 
-- Crear reservas manuales.
-- Confirmar reservas.
-- Cancelar reservas.
-- Finalizar reservas.
-- Marcar reservas como no presentadas.
-- Registrar pagos manuales.
-- Consultar el planning interno.
-- Crear reservas recurrentes.
-- Bloquear pistas por periodos concretos.
+- Daily planning.
+- Separate columns by court.
+- Free and occupied slots.
+- Duration selector.
+- Default duration of 90 minutes.
+- Automatic refresh when changing date or duration.
+- Booking creation from free slots.
+- Availability validation.
+- Colors based on booking status.
+- Direct access to existing bookings.
 
-### Portal del cliente
+Planning colors:
 
-Los clientes autenticados pueden consultar sus reservas de pádel desde el portal. El módulo incluye vistas para listado, detalle y acciones de gestión de reservas.
+- Free: grey.
+- Draft: status-specific color.
+- Pending payment: status-specific color.
+- Confirmed: status-specific color.
+- Finished: dark blue.
+- Cancelled / unavailable: differentiated color.
 
-## Parámetros técnicos
+## Website Bookings
 
-El módulo utiliza varios parámetros de sistema de Odoo:
+The module adds a public booking page:
 
-- `padel.opening_hour`: hora de apertura.
-- `padel.closing_hour`: hora de cierre.
-- `padel.slot_step_minutes`: intervalo de los huecos del planning.
-- `padel.allowed_durations`: duraciones permitidas, separadas por coma.
-- `padel.payment_hold_minutes`: minutos de bloqueo de reservas pendientes de pago.
-- `padel.timezone`: zona horaria usada para las reservas.
-- `padel.conditions_url`: URL de condiciones de reserva y cancelación.
-- `padel.manual_payment_default_partner_id`: contacto usado como referencia para pagos manuales cuando corresponde.
+/padel/reservar
 
-## Seguridad
+From this page, the customer can:
 
-El módulo define dos grupos principales:
+* Select a date.
+* Select a duration.
+* View availability by court.
+* Select a free slot.
+* Enter their details.
+* Proceed to the website cart.
+* Complete payment through the configured Odoo payment gateway.
 
-- Usuario de pádel.
-- Administrador de pádel.
+The default duration on the website is **90 minutes**.
 
-Los usuarios internos tienen acceso a la app base. Los administradores del sistema reciben permisos de administración del módulo.
+The page also includes links to:
 
-Antes de usarlo en producción, conviene revisar los permisos de acceso y adaptarlos a la política interna de cada instalación.
+* My padel bookings.
+* Sales and cancellation terms.
 
-## Datos creados por el módulo
+## Availability Control
 
-El módulo crea:
+The system checks availability at several points:
 
-- Una secuencia para reservas de pádel.
-- Un producto de tipo servicio para la reserva de pista de pádel.
-- Un cron para liberar reservas web pendientes de pago caducadas.
+* When loading the planning.
+* When selecting a slot.
+* When creating the booking.
+* When changing date, time, or court.
+* When generating recurring bookings.
 
-No crea pistas ni tarifas por defecto, por lo que deben configurarse manualmente tras la instalación.
+This prevents overlaps between confirmed, pending payment, draft, finished bookings, and court blocks.
 
-## Integración con pagos y devoluciones
+## Online Bookings Pending Payment
 
-El módulo se integra con el flujo de ventas y pagos de Odoo.
+Bookings created from the website are initially set as **Pending payment**.
 
-Incluye lógica específica para gestionar devoluciones Redsys desde la reserva. Esta funcionalidad debe probarse cuidadosamente en un entorno de pruebas antes de usarse en producción, especialmente si el proveedor de pago permite operaciones reales de devolución.
+The expiration cron only applies to bookings:
 
-## Desarrollo
+* Created from the website.
+* In pending payment status.
+* With an expired payment deadline.
 
-Estructura principal del módulo:
+Manual bookings are not automatically cancelled by the cron.
+
+## Pricing
+
+The module allows configuring padel pricing rules with:
+
+* Application to all courts or to a specific court.
+* Application to all days or to a specific day.
+* Light and no-light time ranges.
+* Price for 60 minutes.
+* Price for 90 minutes.
+* Price for 120 minutes.
+
+The price can be calculated proportionally when a booking crosses from no-light time to light time.
+
+Example:
+
+* 60 minutes: €5 without light / €9 with light.
+* 90 minutes: €7.50 without light / €13.50 with light.
+* 120 minutes: €10 without light / €18 with light.
+
+If the date, time, court, or duration of a booking is changed, the system recalculates the amount according to the active pricing rules.
+
+## Online Payment
+
+The online payment flow uses Odoo’s standard eCommerce flow.
+
+Process:
+
+1. The customer selects a slot.
+2. A pending payment booking is created.
+3. A website cart/sales order is created.
+4. The booking line is added with the calculated price.
+5. The customer completes checkout.
+6. Payment is processed through the configured payment gateway.
+7. After successful payment, the booking is confirmed.
+8. An invoice is generated if applicable.
+9. The confirmation email is logged in the booking chatter.
+
+## Manual POS Payment
+
+For manually created bookings, the module allows registering the payment directly from the booking.
+
+Button:
 
 ```text
-odoo_padel_reservation_management/
-├── controllers/
-├── data/
-├── models/
-├── security/
-├── static/
-├── views/
-├── __init__.py
-├── __manifest__.py
-├── LICENSE
-└── README.md
+Register POS Payment
 ```
 
-## Recomendaciones antes de publicar el repositorio
+The wizard allows the user to:
 
-Antes de hacer público este módulo, se recomienda:
+* Select the Point of Sale.
+* Select an open POS session.
+* Select the payment method.
+* Register the amount.
+* Create a POS order.
+* Generate an invoice.
+* Confirm the booking.
+* Register the payment in the selected POS cash control.
 
-1. Revisar textos de emails, portal y condiciones legales para adaptarlos a cada instalación.
-2. Añadir y mantener el archivo `LICENSE` coherente con la licencia declarada en el manifiesto.
-3. Añadir un `.gitignore` para evitar publicar cachés, archivos temporales, entornos virtuales o copias locales.
-4. Probar instalación, actualización y desinstalación en una base de datos de pruebas.
-5. Revisar permisos de seguridad y reglas de acceso antes de usarlo con datos reales.
-6. Verificar que no se incluyen credenciales, claves API, tokens, exportaciones de base de datos ni datos personales.
-7. Documentar claramente qué versión de Odoo soporta el módulo.
+The default Point of Sale is ID 2, but the user may select between the allowed POS records ID 1 and ID 2.
 
-## Proyecto de origen / caso de uso
+## Invoicing
 
-Este módulo se desarrolló tomando como caso de uso inicial la gestión de reservas de pistas de pádel de Camping Fuente.
+The module can generate and link:
 
-Camping Fuente no figura como autor del módulo. La referencia se incluye únicamente como proyecto de origen y ejemplo de aplicación práctica.
+* Sales order.
+* Customer invoice.
+* Incoming payment.
+* Credit note.
+* Outgoing refund payment.
 
-## Autor
+For manual payments, the system generates the invoice and records the payment in the selected POS.
 
-RayTugah
+## Redsys Refunds
 
-## Licencia
+The module includes an internal button to prepare a Redsys refund from the booking form.
 
-Este proyecto se distribuye bajo licencia **GNU Lesser General Public License v3.0**.
+Button:
 
-El repositorio incluye el archivo `LICENSE` con el texto de la licencia. El manifiesto de Odoo declara la licencia como `LGPL-3`.
+```text
+Prepare Redsys Refund
+```
+
+Features:
+
+* Double confirmation before executing the refund.
+* Important warning indicating that the action may refund money to the customer.
+* Attempted refund using the standard Odoo flow.
+* If the connector does not process it correctly, direct refund attempt through Redsys REST.
+* Result logged in the chatter.
+* Refund transaction linked to the booking.
+* Credit note creation if the refund is successful.
+* Outgoing refund payment registration.
+
+Refunds are not executed automatically from the customer portal.
+
+## Customer Portal
+
+The module adds a portal section:
+
+```text
+/my/padel
+```
+
+Features:
+
+* Custom padel icon.
+* Customer booking list.
+* Ordered by booking number descending.
+* Booking detail view.
+* Possibility to cancel bookings from the portal.
+* Informational message about administrative refund review.
+* Link to sales and cancellation terms.
+
+When a customer cancels a booking from the portal:
+
+* The booking is set to cancelled.
+* The action is logged in the chatter.
+* An internal email is sent to the campsite.
+* The internal email includes a direct link to the booking in Odoo.
+
+## Automatic Emails
+
+### Customer Confirmation Email
+
+When an online booking is confirmed, the system automatically sends a confirmation email to the customer.
+
+The email includes:
+
+* Booking number.
+* Booking name.
+* Date.
+* Court.
+* Time slot.
+* Amount paid.
+* Key pickup instructions.
+* Lighting instructions.
+* Key return instructions.
+* Cancellation and change information.
+* Link to the booking portal.
+* Link to sales and cancellation terms.
+
+The email sending is always logged in the booking chatter, including:
+
+* Recipient.
+* Subject.
+* Generated email ID.
+* Error message, if sending fails.
+* Warning if no customer email is available.
+
+### Internal Email for Portal Cancellations
+
+When a customer cancels a booking from the portal, an internal email is sent to the campsite with the subject:
+
+```text
+Padel booking cancelled from the portal
+```
+
+It includes:
+
+* Booking number.
+* Customer.
+* Email.
+* Phone.
+* Court.
+* Date and time.
+* Amount.
+* Linked sales order.
+* Direct link to the booking in Odoo.
+
+## Recurring Bookings
+
+The module includes a recurring booking tool.
+
+It allows selecting:
+
+* Customer.
+* Booking name.
+* Court.
+* Day of the week.
+* Start time.
+* End time.
+* Start date.
+* End date.
+* Status of the generated bookings.
+
+Before creating the bookings, the system checks overlaps and court blocks. If conflicts are detected, bookings are not created and a warning is shown with the affected dates.
+
+## Chatter and Traceability
+
+The module logs important booking changes in the chatter:
+
+* Creation.
+* Status changes.
+* Date changes.
+* Time changes.
+* Court changes.
+* Amount changes.
+* Customer changes.
+* Sales order creation.
+* Invoice generation.
+* Payment registration.
+* Email sending.
+* Portal cancellations.
+* Refunds.
+* Credit notes.
+* Outgoing payments.
+* Payment or refund errors.
+
+## Sales and Cancellation Terms
+
+The module links to the sales and cancellation terms published in Odoo Knowledge:
+
+```text
+https://campingfuente.odoo.com/knowledge/article/722
+```
+
+This link appears in:
+
+* Public booking page.
+* Confirmation email.
+* Customer portal.
+* Cancellation information messages.
+
+## Dependencies
+
+Main module dependencies:
+
+```python
+'base',
+'web',
+'website',
+'website_sale',
+'portal',
+'sale',
+'account',
+'payment',
+'mail',
+'calendar',
+'point_of_sale',
+'contacts',
+```
+
+## Installation on Odoo.sh
+
+1. Copy the `odoo_padel_reservation_management` folder into the Odoo.sh repository.
+2. Commit and push the changes.
+3. Wait for the Odoo.sh build to complete.
+4. Enable developer mode in Odoo.
+5. Go to Apps.
+6. Update the app list.
+7. Search for `Odoo Padel Reservation Management`.
+8. Install or update the module.
+
+## Recommended Initial Configuration
+
+After installing the module:
+
+1. Create padel courts.
+2. Mark the courts as active.
+3. Enable website booking for the relevant courts.
+4. Configure pricing rules.
+5. Review the padel booking product.
+6. Review the online payment provider.
+7. Review available Points of Sale.
+8. Review the email template.
+9. Review the customer portal.
+10. Test the full flow:
+
+    * Website booking.
+    * Online payment.
+    * Confirmation email.
+    * Portal access.
+    * Cancellation.
+    * Manual POS payment.
+    * Redsys refund from backend.
+
+## Security
+
+The module defines access rights for internal Odoo users and portal access for customers.
+
+Customers can only view their own bookings from the portal.
+
+Administrative operations, refunds, manual payments, recurring bookings, and configuration are restricted to authorized internal users.
+
+## Important Notes
+
+* Manual bookings are not automatically cancelled due to payment expiration.
+* Website bookings pending payment may be automatically cancelled by cron when the payment deadline expires.
+* Automatic refunds are not allowed from the portal.
+* Redsys refunds can only be requested from the backend by authorized staff.
+* The refund button includes double confirmation.
+* Draft status is allowed for internal editing, but should not be left as the final working status.
+
+## License
+
+This module is distributed under the **LGPL-3** license.
+
+## Author
+
+**RayTugah**
