@@ -4,8 +4,7 @@
     'version': '19.0.1.5.4',
     'category': 'Website/Appointment',
     'summary': 'Gestion de reservas de pistas de padel para Odoo.sh 19 con disponibilidad web e interna.',
-    'author': 'Camping Fuente',
-    'website': 'https://www.campingfuente.com',
+    'author': 'RayTugah',
     'license': 'LGPL-3',
     'depends': [
         'base',

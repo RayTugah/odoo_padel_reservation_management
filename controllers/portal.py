@@ -204,12 +204,18 @@ class PadelPortalController(CustomerPortal):
                 padel_skip_refund=True,
             ).action_cancel()
             booking.sudo().action_send_portal_cancellation_notification()
-            msg = _(
-                'Tu reserva %(booking)s ha sido anulada correctamente y el hueco queda liberado. '
-                'El equipo de administracion valorara la devolucion de la misma en las proximas horas. '
-                'Por favor, revisa nuestras condiciones de devolucion y de reserva del padel: '
-                'https://campingfuente.odoo.com/knowledge/article/722'
-            ) % {'booking': booking.name}
+            conditions_url = request.env['ir.config_parameter'].sudo().get_param('padel.conditions_url', '') or ''
+            if conditions_url:
+                msg = _(
+                    'Tu reserva %(booking)s ha sido anulada correctamente y el hueco queda liberado. '
+                    'El equipo de administracion valorara la devolucion de la misma en las proximas horas. '
+                    'Por favor, revisa las condiciones de devolucion y de reserva del padel: %(conditions_url)s'
+                ) % {'booking': booking.name, 'conditions_url': conditions_url}
+            else:
+                msg = _(
+                    'Tu reserva %(booking)s ha sido anulada correctamente y el hueco queda liberado. '
+                    'El equipo de administracion valorara la devolucion de la misma en las proximas horas.'
+                ) % {'booking': booking.name}
             booking.sudo().message_post(body=_(
                 'Anulacion realizada desde el portal. No se solicita devolucion automatica desde el portal. '
                 'Se informa al cliente de que administracion valorara la devolucion en las proximas horas y se le remite a las condiciones de devolucion y reserva del padel.'

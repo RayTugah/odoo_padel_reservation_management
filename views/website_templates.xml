@@ -64,7 +64,7 @@
                         <h1>Reserva de pista de padel</h1>
                         <p>Selecciona fecha y duracion. A continuacion podras elegir directamente un hueco libre en el planning.</p>
                         <a href="/my/padel" class="btn btn-outline-primary mt-2 me-2">Ver mis reservas</a>
-                        <a href="https://campingfuente.odoo.com/knowledge/article/722" class="btn btn-outline-secondary mt-2" target="_blank" rel="noopener">Condiciones de venta y cancelación</a>
+                        <a t-att-href="request.env['ir.config_parameter'].sudo().get_param('padel.conditions_url', '#')" class="btn btn-outline-secondary mt-2" target="_blank" rel="noopener">Condiciones de venta y cancelación</a>
                     </div>
                 </section>
                 <section class="pt16 pb48">

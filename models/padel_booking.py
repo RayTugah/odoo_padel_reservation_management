@@ -110,11 +110,11 @@ class PadelBooking(models.Model):
                 booking.write({'confirmation_email_sent': True})
                 continue
             company = booking.company_id if 'company_id' in booking._fields and booking.company_id else self.env.company
-            email_from = company.email or 'info@campingfuente.com'
+            email_from = company.email or self.env.user.email or ''
             customer_name = booking.customer_name or booking.partner_id.display_name or _('cliente')
-            base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url') or 'https://campingfuente.odoo.com'
+            base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url') or ''
             portal_url = '%s/my/padel' % base_url.rstrip('/')
-            conditions_url = 'https://campingfuente.odoo.com/knowledge/article/722'
+            conditions_url = self.env['ir.config_parameter'].sudo().get_param('padel.conditions_url', '') or '#' 
             fecha_txt = booking._padel_local_datetime_text(booking.start_datetime, '%d/%m/%Y')
             hora_inicio_txt = booking._padel_local_datetime_text(booking.start_datetime, '%H:%M')
             hora_fin_txt = booking._padel_local_datetime_text(booking.end_datetime, '%H:%M')
@@ -148,7 +148,7 @@ class PadelBooking(models.Model):
                 '<p><strong>Condiciones de venta y cancelación:</strong><br/>',
                 '<a href="%s">Consultar condiciones de devolución y reserva del pádel</a></p>' % html_escape(conditions_url),
                 '<p>Muchas gracias.</p>',
-                '<p>Camping Fuente</p>',
+                '<p>%s</p>' % html_escape(company.name or ''),
             ])
             subject = 'Confirmación reserva pista de pádel %s' % (booking.name or '')
             try:
@@ -183,8 +183,8 @@ class PadelBooking(models.Model):
         """Enviar aviso interno cuando un cliente anula una reserva desde el portal."""
         for booking in self:
             company = self.env.company
-            email_to = company.email or 'info@campingfuente.com'
-            email_from = company.email or 'info@campingfuente.com'
+            email_to = company.email or self.env.user.email or ''
+            email_from = company.email or self.env.user.email or ''
 
             def fmt_dt(value):
                 if not value:

@@ -17,7 +17,7 @@ El módulo está pensado para instalaciones que necesitan publicar disponibilida
 - Gestión de tarifas por duración y franjas horarias.
 - Reservas recurrentes desde asistente interno.
 - Área de portal para que el cliente consulte sus reservas de pádel.
-- Solicitud/cancelación de reservas desde portal según el flujo configurado.
+- Solicitud y cancelación de reservas desde portal según el flujo configurado.
 - Integración con pedidos de venta, facturas y pagos.
 - Registro de pagos manuales mediante asistente interno.
 - Soporte para preparación de devoluciones Redsys desde la reserva.
@@ -65,6 +65,8 @@ Después de instalar el módulo:
    - Intervalo del planning.
    - Duraciones permitidas.
    - Minutos de bloqueo de reservas pendientes de pago.
+   - Zona horaria.
+   - URL de condiciones de reserva y cancelación, si se desea mostrar en el portal.
 5. Configurar el producto de reserva de pista si se desea ajustar su nombre, impuestos o cuentas contables.
 6. Revisar el flujo de pago web en Odoo.
 7. Probar una reserva completa en entorno de pruebas antes de activarlo públicamente.
@@ -103,6 +105,7 @@ El módulo utiliza varios parámetros de sistema de Odoo:
 - `padel.allowed_durations`: duraciones permitidas, separadas por coma.
 - `padel.payment_hold_minutes`: minutos de bloqueo de reservas pendientes de pago.
 - `padel.timezone`: zona horaria usada para las reservas.
+- `padel.conditions_url`: URL de condiciones de reserva y cancelación.
 - `padel.manual_payment_default_partner_id`: contacto usado como referencia para pagos manuales cuando corresponde.
 
 ## Seguridad
@@ -146,6 +149,7 @@ odoo_padel_reservation_management/
 ├── views/
 ├── __init__.py
 ├── __manifest__.py
+├── LICENSE
 └── README.md
 ```
 
@@ -153,23 +157,26 @@ odoo_padel_reservation_management/
 
 Antes de hacer público este módulo, se recomienda:
 
-1. Sustituir o parametrizar cualquier URL específica de una empresa o instalación concreta.
-2. Revisar textos de emails, portal y condiciones legales para que sean genéricos o configurables.
-3. Añadir un archivo `LICENSE` coherente con la licencia declarada en el manifiesto.
-4. Añadir un `.gitignore` para evitar publicar cachés, archivos temporales, entornos virtuales o copias locales.
-5. Probar instalación, actualización y desinstalación en una base de datos de pruebas.
-6. Revisar permisos de seguridad y reglas de acceso antes de usarlo con datos reales.
-7. Verificar que no se incluyen credenciales, claves API, tokens, exportaciones de base de datos ni datos personales.
-8. Documentar claramente qué versión de Odoo soporta el módulo.
+1. Revisar textos de emails, portal y condiciones legales para adaptarlos a cada instalación.
+2. Añadir y mantener el archivo `LICENSE` coherente con la licencia declarada en el manifiesto.
+3. Añadir un `.gitignore` para evitar publicar cachés, archivos temporales, entornos virtuales o copias locales.
+4. Probar instalación, actualización y desinstalación en una base de datos de pruebas.
+5. Revisar permisos de seguridad y reglas de acceso antes de usarlo con datos reales.
+6. Verificar que no se incluyen credenciales, claves API, tokens, exportaciones de base de datos ni datos personales.
+7. Documentar claramente qué versión de Odoo soporta el módulo.
 
-## Licencia
+## Proyecto de origen / caso de uso
 
-Este módulo declara licencia `LGPL-3` en su manifiesto.
+Este módulo se desarrolló tomando como caso de uso inicial la gestión de reservas de pistas de pádel de Camping Fuente.
 
-Si el repositorio se va a publicar en GitHub, se recomienda añadir el texto completo de la licencia en un archivo `LICENSE`.
+Camping Fuente no figura como autor del módulo. La referencia se incluye únicamente como proyecto de origen y ejemplo de aplicación práctica.
 
 ## Autor
 
-Camping Fuente
+RayTugah
 
-Web: <https://www.campingfuente.com>
+## Licencia
+
+Este proyecto se distribuye bajo licencia **GNU Lesser General Public License v3.0**.
+
+El repositorio incluye el archivo `LICENSE` con el texto de la licencia. El manifiesto de Odoo declara la licencia como `LGPL-3`.

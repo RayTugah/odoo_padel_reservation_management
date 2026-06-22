@@ -161,7 +161,7 @@
                             <strong>Devoluciones:</strong> si anulas una reserva pagada, el equipo de administración valorará la devolución de la misma en las próximas horas.
                             <br/>
                             Antes de anular, revisa nuestras
-                            <a href="https://campingfuente.odoo.com/knowledge/article/722" target="_blank" class="alert-link">
+                            <a t-att-href="request.env['ir.config_parameter'].sudo().get_param('padel.conditions_url', '#')" target="_blank" class="alert-link">
                                 condiciones de devolución y de reserva del pádel
                             </a>.
                         </div>
@@ -189,7 +189,7 @@
                                             Si la reserva estaba pagada, el equipo de administración valorará la devolución de la misma en las próximas horas.
                                             <br/>
                                             Antes de confirmar, revisa nuestras
-                                            <a href="https://campingfuente.odoo.com/knowledge/article/722" target="_blank" class="alert-link">
+                                            <a t-att-href="request.env['ir.config_parameter'].sudo().get_param('padel.conditions_url', '#')" target="_blank" class="alert-link">
                                                 condiciones de devolución y de reserva del pádel
                                             </a>.
                                             <div class="mt-2 p-2 bg-white border rounded">
