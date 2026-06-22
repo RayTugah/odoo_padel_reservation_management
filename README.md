@@ -1,4 +1,4 @@
-# Camping Padel Reservation
+# Odoo Padel Reservation Management
 
 Custom module for **Odoo 19 / Odoo.sh** designed to manage padel court bookings from the backend, customer portal, and public website.
 
@@ -384,13 +384,13 @@ Main module dependencies:
 
 ## Installation on Odoo.sh
 
-1. Copy the `camping_padel_reservation` folder into the Odoo.sh repository.
+1. Copy the `odoo_padel_reservation_management` folder into the Odoo.sh repository.
 2. Commit and push the changes.
 3. Wait for the Odoo.sh build to complete.
 4. Enable developer mode in Odoo.
 5. Go to Apps.
 6. Update the app list.
-7. Search for `Camping Padel Reservation`.
+7. Search for `Odoo Padel Reservation Management`.
 8. Install or update the module.
 
 ## Recommended Initial Configuration
