@@ -1,0 +1,12 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_padel_court_internal,padel.court internal,model_padel_court,base.group_user,1,0,0,0
+access_padel_court_manager,padel.court manager,model_padel_court,odoo_padel_reservation_management.group_padel_manager,1,1,1,1
+access_padel_booking_internal,padel.booking internal,model_padel_booking,base.group_user,1,1,1,0
+access_padel_booking_manager,padel.booking manager,model_padel_booking,odoo_padel_reservation_management.group_padel_manager,1,1,1,1
+access_padel_price_rule_internal,padel.price.rule internal,model_padel_price_rule,base.group_user,1,0,0,0
+access_padel_price_rule_manager,padel.price.rule manager,model_padel_price_rule,odoo_padel_reservation_management.group_padel_manager,1,1,1,1
+access_padel_court_block_internal,padel.court.block internal,model_padel_court_block,base.group_user,1,1,1,0
+access_padel_court_block_manager,padel.court.block manager,model_padel_court_block,odoo_padel_reservation_management.group_padel_manager,1,1,1,1
+access_padel_recurring_booking_wizard_internal,padel.recurring.booking.wizard internal,model_padel_recurring_booking_wizard,base.group_user,1,1,1,1
+access_padel_manual_payment_wizard_internal,padel.manual.payment.wizard internal,model_padel_manual_payment_wizard,base.group_user,1,1,1,1
+access_padel_redsys_refund_confirmation_wizard_internal,padel.redsys.refund.confirmation.wizard internal,model_padel_redsys_refund_confirmation_wizard,base.group_user,1,1,1,1

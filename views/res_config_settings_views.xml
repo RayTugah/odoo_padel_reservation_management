@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_padel" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.padel</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app data-string="Padel" string="Padel" name="padel_settings">
+                    <block title="Reservas de padel" name="padel_reservation_settings">
+                        <setting string="Horario general">
+                            <div class="row mt16">
+                                <label for="padel_opening_hour" class="col-lg-3 o_light_label"/>
+                                <field name="padel_opening_hour" widget="float_time"/>
+                            </div>
+                            <div class="row mt16">
+                                <label for="padel_closing_hour" class="col-lg-3 o_light_label"/>
+                                <field name="padel_closing_hour" widget="float_time"/>
+                            </div>
+                        </setting>
+                        <setting string="Disponibilidad web">
+                            <field name="padel_slot_step_minutes"/>
+                            <field name="padel_allowed_durations"/>
+                            <field name="padel_payment_hold_minutes"/>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="padel_planning_table" name="Planning padel">
+        <div class="o_padel_planning_legend mb-3">
+            <span class="o_padel_legend_item"><span class="o_padel_legend_box o_free"></span> Libre</span>
+            <span class="o_padel_legend_item"><span class="o_padel_legend_box o_busy"></span> Ocupado</span>
+        </div>
+        <t t-if="not courts">
+            <div class="alert alert-warning">No hay pistas disponibles para reserva web. Crea al menos una pista activa y marca "Permitir reserva web".</div>
+        </t>
+        <t t-elif="not slots">
+            <div class="alert alert-warning">No hay tramos disponibles para la fecha y duracion seleccionadas.</div>
+        </t>
+        <t t-else="">
+            <div class="o_padel_planning_wrapper">
+                <table class="table table-bordered o_padel_planning_table">
+                    <thead>
+                        <tr>
+                            <th class="o_padel_time_col">Hora</th>
+                            <t t-foreach="courts" t-as="court">
+                                <th class="o_padel_court_col"><t t-esc="court['name']"/></th>
+                            </t>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-foreach="slots" t-as="slot">
+                            <tr>
+                                <th class="o_padel_time_cell"><t t-esc="slot['time']"/></th>
+                                <t t-foreach="slot['courts']" t-as="court_slot">
+                                    <t t-if="court_slot['available']">
+                                        <td class="o_padel_slot_cell o_available">
+                                            <button type="button" class="o_padel_slot_button"
+                                                t-att-data-court-id="court_slot['court_id']"
+                                                t-att-data-court-name="court_slot['court_name']"
+                                                t-att-data-booking-date="today"
+                                                t-att-data-booking-time="slot['time']"
+                                                t-att-data-duration="selected_duration"
+                                                t-att-data-price="court_slot['price']"
+                                                t-att-data-price-formatted="court_slot.get('price_formatted') or court_slot['price']">
+                                                <span class="o_slot_state">Libre</span>
+                                                <span class="o_slot_price"><t t-esc="court_slot.get('price_formatted') or court_slot['price']"/> €</span>
+                                            </button>
+                                        </td>
+                                    </t>
+                                    <t t-else="">
+                                        <td class="o_padel_slot_cell o_busy">
+                                            <span class="o_slot_state"><t t-esc="court_slot.get('status_label') or 'Ocupado'"/></span>
+                                        </td>
+                                    </t>
+                                </t>
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
+            </div>
+        </t>
+    </template>
+
+    <template id="padel_booking_page" name="Reserva pista de padel">
+        <t t-call="website.layout">
+            <div id="wrap" class="oe_structure">
+                <section class="s_title pt32 pb16">
+                    <div class="container">
+                        <h1>Reserva de pista de padel</h1>
+                        <p>Selecciona fecha y duracion. A continuacion podras elegir directamente un hueco libre en el planning.</p>
+                        <a href="/my/padel" class="btn btn-outline-primary mt-2 me-2">Ver mis reservas</a>
+                        <a href="https://campingfuente.odoo.com/knowledge/article/722" class="btn btn-outline-secondary mt-2" target="_blank" rel="noopener">Condiciones de venta y cancelación</a>
+                    </div>
+                </section>
+                <section class="pt16 pb48">
+                    <div class="container o_padel_booking_page">
+                        <div class="row mb-4">
+                            <div class="col-md-4 mb-2">
+                                <label class="form-label" for="padel_booking_date">Fecha</label>
+                                <input type="date" class="form-control" id="padel_booking_date" t-att-value="today"/>
+                            </div>
+                            <div class="col-md-4 mb-2">
+                                <label class="form-label" for="padel_booking_duration">Duracion</label>
+                                <select class="form-select" id="padel_booking_duration">
+                                    <t t-foreach="durations" t-as="duration">
+                                        <option t-att-value="duration" t-att-selected="duration == selected_duration"><t t-esc="duration"/> minutos</option>
+                                    </t>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-2 d-flex align-items-end">
+                                <div class="alert alert-light border w-100 mb-0 py-2 text-center">
+                                    La disponibilidad se actualiza automaticamente.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="padel_availability_result" class="mb-4">
+                            <t t-call="odoo_padel_reservation_management.padel_planning_table"/>
+                        </div>
+
+                        <div id="padel_selected_slot_panel" class="o_padel_selected_slot_panel d-none">
+                            <h3 class="mb-3">Completar reserva</h3>
+                            <div class="row">
+                                <div class="col-lg-4 mb-3 mb-lg-0">
+                                    <div class="o_padel_selected_summary">
+                                        <h5 class="mb-3">Hueco seleccionado</h5>
+                                        <p class="mb-1"><strong>Pista:</strong> <span id="padel_selected_court_name"></span></p>
+                                        <p class="mb-1"><strong>Fecha:</strong> <span id="padel_selected_date_text"></span></p>
+                                        <p class="mb-1"><strong>Hora:</strong> <span id="padel_selected_time_text"></span></p>
+                                        <p class="mb-1"><strong>Duracion:</strong> <span id="padel_selected_duration_text"></span></p>
+                                        <p class="mb-0"><strong>Precio:</strong> <span id="padel_selected_price_text"></span></p>
+                                    </div>
+                                </div>
+                                <div class="col-lg-8">
+                                    <form method="post" action="/padel/booking/create" class="o_padel_booking_form">
+                                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                        <input type="hidden" name="court_id" id="padel_form_court_id"/>
+                                        <input type="hidden" name="booking_date" id="padel_form_booking_date"/>
+                                        <input type="hidden" name="booking_time" id="padel_form_booking_time"/>
+                                        <input type="hidden" name="duration" id="padel_form_duration"/>
+
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label" for="padel_customer_name">Nombre</label>
+                                                <input id="padel_customer_name" name="customer_name" class="form-control" required="required"/>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label" for="padel_customer_phone">Telefono</label>
+                                                <input id="padel_customer_phone" name="customer_phone" class="form-control"/>
+                                            </div>
+                                            <div class="col-md-12 mb-3">
+                                                <label class="form-label" for="padel_customer_email">Email</label>
+                                                <input id="padel_customer_email" name="customer_email" type="email" class="form-control"/>
+                                            </div>
+                                        </div>
+                                        <button class="btn btn-primary" type="submit">Reservar este hueco</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            <script type="text/javascript">
+                (function () {
+                    function ready(fn) {
+                        if (document.readyState === 'loading') {
+                            document.addEventListener('DOMContentLoaded', fn);
+                        } else {
+                            fn();
+                        }
+                    }
+                    function durationLabel(value) {
+                        var minutes = parseInt(value || '0', 10);
+                        if (minutes === 60) { return '1 hora'; }
+                        if (minutes === 90) { return '1 hora y media'; }
+                        if (minutes === 120) { return '2 horas'; }
+                        return minutes + ' minutos';
+                    }
+                    function goToSelectedAvailability() {
+                        var dateInput = document.getElementById('padel_booking_date');
+                        var durationInput = document.getElementById('padel_booking_duration');
+                        if (!dateInput || !durationInput || !dateInput.value) { return; }
+                        var url = '/padel/reservar?booking_date=' + encodeURIComponent(dateInput.value) + '&amp;duration=' + encodeURIComponent(durationInput.value);
+                        window.location.href = url;
+                    }
+                    function openSelectedPanel(button) {
+                        var panel = document.getElementById('padel_selected_slot_panel');
+                        if (!panel) { return; }
+                        var setText = function (id, value) {
+                            var el = document.getElementById(id);
+                            if (el) { el.textContent = value || ''; }
+                        };
+                        var setValue = function (id, value) {
+                            var el = document.getElementById(id);
+                            if (el) { el.value = value || ''; }
+                        };
+                        var duration = button.dataset.duration || '';
+                        setText('padel_selected_court_name', button.dataset.courtName || '');
+                        setText('padel_selected_date_text', button.dataset.bookingDate || '');
+                        setText('padel_selected_time_text', button.dataset.bookingTime || '');
+                        setText('padel_selected_duration_text', durationLabel(duration));
+                        setText('padel_selected_price_text', (button.dataset.priceFormatted || button.dataset.price || '') + ' €');
+                        setValue('padel_form_court_id', button.dataset.courtId || '');
+                        setValue('padel_form_booking_date', button.dataset.bookingDate || '');
+                        setValue('padel_form_booking_time', button.dataset.bookingTime || '');
+                        setValue('padel_form_duration', duration);
+                        document.querySelectorAll('.o_padel_slot_button.o_selected').forEach(function (selected) {
+                            selected.classList.remove('o_selected');
+                        });
+                        button.classList.add('o_selected');
+                        panel.classList.remove('d-none');
+                        panel.scrollIntoView({behavior: 'smooth', block: 'start'});
+                    }
+                    ready(function () {
+                        var dateInput = document.getElementById('padel_booking_date');
+                        var durationInput = document.getElementById('padel_booking_duration');
+                        if (dateInput) { dateInput.addEventListener('change', goToSelectedAvailability); }
+                        if (durationInput) { durationInput.addEventListener('change', goToSelectedAvailability); }
+                        document.querySelectorAll('.o_padel_slot_button').forEach(function (button) {
+                            button.addEventListener('click', function () { openSelectedPanel(button); });
+                        });
+                    });
+                }());
+            </script>
+
+        </t>
+    </template>
+
+    <template id="padel_booking_confirmation" name="Confirmacion reserva padel">
+        <t t-call="website.layout">
+            <div id="wrap" class="oe_structure">
+                <section class="pt48 pb48">
+                    <div class="container">
+                        <div class="alert alert-success">
+                            <h2>Reserva recibida</h2>
+                            <p>Tu reserva se ha creado correctamente y queda pendiente de confirmacion.</p>
+                            <p><strong>Referencia:</strong> <t t-esc="booking.name"/></p>
+                            <p><strong>Pista:</strong> <t t-esc="booking.court_id.name"/></p>
+                            <p><strong>Inicio:</strong> <t t-esc="booking.start_datetime"/></p>
+                            <p><strong>Importe:</strong> <t t-esc="booking.price"/> €</p>
+                            <a href="/padel/reservar" class="btn btn-primary">Hacer otra reserva</a>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </t>
+    </template>
+
+    <template id="padel_booking_error" name="Error reserva padel">
+        <t t-call="website.layout">
+            <div id="wrap" class="oe_structure">
+                <section class="pt48 pb48">
+                    <div class="container">
+                        <div class="alert alert-danger">
+                            <h2>No se ha podido crear la reserva</h2>
+                            <p><t t-esc="message"/></p>
+                            <a href="/padel/reservar" class="btn btn-primary">Volver a intentar</a>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </t>
+    </template>
+</odoo>

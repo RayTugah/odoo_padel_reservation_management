@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_padel_redsys_refund_confirmation_wizard_form" model="ir.ui.view">
+        <field name="name">padel.redsys.refund.confirmation.wizard.form</field>
+        <field name="model">padel.redsys.refund.confirmation.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Confirmar devolucion Redsys">
+                <div class="alert alert-danger" role="alert">
+                    <strong>Aviso importante:</strong> esta accion puede devolver dinero al cliente a traves de Redsys.
+                    Utilicela solo si ha comprobado que procede realizar la devolucion y esta completamente seguro.
+                </div>
+                <group>
+                    <field name="booking_id" readonly="1"/>
+                    <field name="booking_reference" readonly="1"/>
+                    <field name="amount" readonly="1"/>
+                    <field name="confirm_refund"/>
+                </group>
+                <footer>
+                    <button name="action_confirm_refund" type="object" string="Si, preparar devolucion Redsys" class="btn-danger" confirm="Confirmacion final: esta accion puede devolver dinero real al cliente. ¿Esta totalmente seguro de continuar?"/>
+                    <button string="Cancelar" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

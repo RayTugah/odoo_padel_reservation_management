@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_padel_internal_planning" model="ir.actions.act_url">
+        <field name="name">Planning</field>
+        <field name="url">/padel/internal/planning</field>
+        <field name="target">self</field>
+    </record>
+
+    <!-- Menu raiz de aplicacion. En Odoo 19 debe ser visible para usuarios internos y tener web_icon. -->
+    <menuitem id="menu_padel_root"
+              name="Padel"
+              sequence="35"
+              groups="base.group_user"
+              action="action_padel_internal_planning"
+              web_icon="odoo_padel_reservation_management,static/description/icon.png"/>
+
+    <menuitem id="menu_padel_planning" name="Planning" parent="menu_padel_root" action="action_padel_internal_planning" sequence="10" groups="base.group_user"/>
+    <menuitem id="menu_padel_booking" name="Reservas" parent="menu_padel_root" action="action_padel_booking" sequence="20" groups="base.group_user"/>
+    <menuitem id="menu_padel_recurring_booking" name="Reservas recurrentes" parent="menu_padel_root" action="action_padel_recurring_booking_wizard" sequence="30" groups="base.group_user"/>
+    <menuitem id="menu_padel_configuration" name="Configuracion" parent="menu_padel_root" sequence="90" groups="odoo_padel_reservation_management.group_padel_manager"/>
+    <menuitem id="menu_padel_court" name="Pistas" parent="menu_padel_configuration" action="action_padel_court" sequence="10"/>
+    <menuitem id="menu_padel_price_rule" name="Tarifas" parent="menu_padel_configuration" action="action_padel_price_rule" sequence="20"/>
+    <menuitem id="menu_padel_court_block" name="Bloqueos" parent="menu_padel_configuration" action="action_padel_court_block" sequence="30"/>
+</odoo>

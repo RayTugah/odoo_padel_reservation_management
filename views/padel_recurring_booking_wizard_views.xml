@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_padel_recurring_booking_wizard_form" model="ir.ui.view">
+        <field name="name">padel.recurring.booking.wizard.form</field>
+        <field name="model">padel.recurring.booking.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Reservas recurrentes">
+                <sheet>
+                    <group>
+                        <group string="Cliente">
+                            <field name="partner_id"/>
+                            <field name="customer_name"/>
+                            <field name="customer_phone"/>
+                            <field name="customer_email"/>
+                        </group>
+                        <group string="Reserva">
+                            <field name="court_id"/>
+                            <field name="weekday"/>
+                            <field name="start_hour" widget="float_time"/>
+                            <field name="end_hour" widget="float_time"/>
+                            <field name="state"/>
+                            <field name="origin"/>
+                        </group>
+                    </group>
+                    <group string="Periodo recurrente">
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                    </group>
+                    <group string="Observaciones">
+                        <field name="note" nolabel="1" placeholder="Texto opcional que se copiara en todas las reservas creadas."/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_create_recurring_bookings" type="object" string="Crear reservas recurrentes" class="btn-primary"/>
+                    <button string="Cancelar" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_padel_recurring_booking_wizard" model="ir.actions.act_window">
+        <field name="name">Reservas recurrentes</field>
+        <field name="res_model">padel.recurring.booking.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{}</field>
+    </record>
+</odoo>

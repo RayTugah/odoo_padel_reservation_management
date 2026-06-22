@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="padel_internal_planning_page" name="Planning interno padel por pistas">
+        <html>
+            <head>
+                <title>Planning padel</title>
+                <meta charset="utf-8"/>
+                <meta name="viewport" content="width=device-width, initial-scale=1"/>
+                <style>
+                    body { margin: 0; font-family: Arial, sans-serif; background: #f8f9fa; color: #111827; }
+                    .o_padel_internal_header { position: sticky; top: 0; z-index: 10; background: white; border-bottom: 1px solid #d8dadd; padding: 12px 18px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+                    .o_padel_internal_header h1 { font-size: 20px; margin: 0 18px 0 0; }
+                    .o_padel_internal_header label { font-weight: 600; font-size: 13px; }
+                    .o_padel_internal_header input, .o_padel_internal_header select { height: 34px; padding: 4px 8px; border: 1px solid #c9ccd2; border-radius: 4px; }
+                    .o_padel_internal_header button, .o_padel_internal_header a { height: 34px; padding: 7px 12px; border-radius: 4px; border: 0; text-decoration: none; font-size: 13px; }
+                    .o_padel_btn_primary { background: #714b67; color: white; }
+                    .o_padel_btn_secondary { background: #e7e9ed; color: #111827; }
+                    .o_padel_internal_content { padding: 16px 18px 32px; }
+                    .o_padel_legend { display: flex; gap: 16px; align-items: center; margin: 0 0 12px; font-size: 13px; }
+                    .o_padel_box { width: 14px; height: 14px; display: inline-block; border-radius: 3px; vertical-align: middle; margin-right: 5px; }
+                    .o_padel_box_free { background: #f3f4f6; border: 1px solid #9ca3af; }
+                    .o_padel_box_draft { background: #e0f2fe; border: 1px solid #0284c7; }
+                    .o_padel_box_pending { background: #fef3c7; border: 1px solid #f59e0b; }
+                    .o_padel_box_confirmed { background: #dcfce7; border: 1px solid #16a34a; }
+                    .o_padel_box_done { background: #1e3a8a; border: 1px solid #1e40af; }
+                    .o_padel_box_block { background: #f3e8ff; border: 1px solid #9333ea; }
+                    .o_padel_planning_scroll { overflow: auto; border: 1px solid #d8dadd; background: white; max-height: calc(100vh - 130px); }
+                    table.o_padel_internal_planning { border-collapse: separate; border-spacing: 0; width: max-content; min-width: 100%; }
+                    .o_padel_internal_planning th, .o_padel_internal_planning td { border-right: 1px solid #d8dadd; border-bottom: 1px solid #d8dadd; padding: 0; }
+                    .o_padel_internal_planning thead th { position: sticky; top: 0; z-index: 5; background: #f3f4f6; height: 42px; text-align: center; font-size: 14px; }
+                    .o_padel_time_col { position: sticky; left: 0; z-index: 6 !important; width: 82px; min-width: 82px; background: #f3f4f6 !important; }
+                    .o_padel_time_cell { position: sticky; left: 0; z-index: 4; width: 82px; min-width: 82px; height: 58px; background: #f8f9fa; text-align: center; font-weight: 700; font-size: 13px; }
+                    .o_padel_court_col { min-width: 260px; width: 260px; }
+                    .o_padel_slot_cell { min-width: 260px; width: 260px; height: 58px; }
+                    .o_padel_slot { display: block; margin: 5px; height: 46px; border-radius: 5px; text-align: center; line-height: 1.15; padding: 7px 6px; box-sizing: border-box; font-size: 13px; overflow: hidden; }
+                    .o_padel_slot_free { background: #f3f4f6; border: 1px solid #9ca3af; color: #374151; text-decoration: none; }
+                    .o_padel_slot_booking { text-decoration: none; }
+                    .o_padel_slot_state_draft { background: #e0f2fe; border: 1px solid #0284c7; color: #075985; }
+                    .o_padel_slot_state_pending_payment { background: #fef3c7; border: 1px solid #f59e0b; color: #92400e; }
+                    .o_padel_slot_state_confirmed { background: #dcfce7; border: 1px solid #16a34a; color: #166534; }
+                    .o_padel_slot_state_done { background: #1e3a8a; border: 1px solid #1e40af; color: #ffffff; }
+                    .o_padel_slot_state_cancelled { background: #fee2e2; border: 1px solid #ef4444; color: #991b1b; }
+                    .o_padel_slot_state_no_show { background: #fce7f3; border: 1px solid #db2777; color: #9d174d; }
+                    .o_padel_slot_block { background: #f3e8ff; border: 1px solid #9333ea; color: #581c87; }
+                    .o_padel_slot strong { display: block; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+                    .o_padel_slot small { display: block; font-size: 11px; opacity: .9; margin-top: 3px; }
+                    .o_padel_empty { padding: 16px; background: #fff3cd; border: 1px solid #ffec99; border-radius: 4px; }
+                </style>
+            </head>
+            <body>
+                <form class="o_padel_internal_header" method="get" action="/padel/internal/planning">
+                    <h1>Planning padel</h1>
+                    <label for="planning_date">Fecha</label>
+                    <input id="planning_date" type="date" name="planning_date" t-att-value="planning_date"/>
+                    <label for="duration">Duracion</label>
+                    <select id="duration" name="duration">
+                        <t t-foreach="durations" t-as="duration">
+                            <option t-att-value="duration" t-att-selected="duration == selected_duration"><t t-esc="duration"/> minutos</option>
+                        </t>
+                    </select>
+                    <button type="submit" class="o_padel_btn_primary">Actualizar</button>
+                    <a href="/web#action=odoo_padel_reservation_management.action_padel_booking&amp;model=padel.booking&amp;view_type=list&amp;menu_id=odoo_padel_reservation_management.menu_padel_booking" class="o_padel_btn_secondary">Ver reservas</a>
+                    <a href="/web#action=odoo_padel_reservation_management.action_padel_booking&amp;model=padel.booking&amp;view_type=list&amp;menu_id=odoo_padel_reservation_management.menu_padel_booking" class="o_padel_btn_secondary">Salir al modulo</a>
+                </form>
+                <div class="o_padel_internal_content">
+                    <div class="o_padel_legend">
+                        <span><span class="o_padel_box o_padel_box_free"></span>Libre</span>
+                        <span><span class="o_padel_box o_padel_box_draft"></span>Borrador</span>
+                        <span><span class="o_padel_box o_padel_box_pending"></span>Pendiente de pago</span>
+                        <span><span class="o_padel_box o_padel_box_confirmed"></span>Confirmada</span>
+                        <span><span class="o_padel_box o_padel_box_done"></span>Finalizada</span>
+                        <span><span class="o_padel_box o_padel_box_block"></span>Bloqueado</span>
+                    </div>
+                    <t t-if="not courts">
+                        <div class="o_padel_empty">No hay pistas activas configuradas.</div>
+                    </t>
+                    <t t-else="">
+                        <div class="o_padel_planning_scroll">
+                            <table class="o_padel_internal_planning">
+                                <thead>
+                                    <tr>
+                                        <th class="o_padel_time_col">Hora</th>
+                                        <t t-foreach="courts" t-as="court">
+                                            <th class="o_padel_court_col"><t t-esc="court.name"/></th>
+                                        </t>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="slots" t-as="slot">
+                                        <tr>
+                                            <th class="o_padel_time_cell"><t t-esc="slot['time']"/></th>
+                                            <t t-foreach="slot['courts']" t-as="court_slot">
+                                                <td class="o_padel_slot_cell">
+                                                    <t t-if="court_slot['available']">
+                                                        <a t-att-href="court_slot.get('new_url')" class="o_padel_slot o_padel_slot_free">
+                                                            <strong>Libre</strong>
+                                                            <small><t t-esc="court_slot.get('price_formatted')"/> €</small>
+                                                        </a>
+                                                    </t>
+                                                    <t t-elif="court_slot.get('is_block')">
+                                                        <span class="o_padel_slot o_padel_slot_block">
+                                                            <strong><t t-esc="court_slot.get('label')"/></strong>
+                                                            <small><t t-esc="court_slot.get('start')"/> - <t t-esc="court_slot.get('end')"/></small>
+                                                        </span>
+                                                    </t>
+                                                    <t t-else="">
+                                                        <a t-att-href="court_slot.get('url')" t-attf-class="o_padel_slot o_padel_slot_booking o_padel_slot_state_#{court_slot.get('state')}">
+                                                            <strong><t t-esc="court_slot.get('label')"/></strong>
+                                                            <small><t t-esc="court_slot.get('state_label')"/> · <t t-esc="court_slot.get('start')"/> - <t t-esc="court_slot.get('end')"/></small>
+                                                        </a>
+                                                    </t>
+                                                </td>
+                                            </t>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </div>
+                    </t>
+                </div>
+            </body>
+        </html>
+    </template>
+</odoo>

@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+
+# Odoo / local development
+*.log
+*.pot
+*.po~
+.local/
+.vscode/
+.idea/
+
+# Environments
+.env
+.venv/
+venv/
+env/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Backups / exports
+*.zip
+*.tar
+*.tar.gz
+*.bak
+*.sql
+*.dump

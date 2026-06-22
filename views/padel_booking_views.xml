@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_padel_booking_list" model="ir.ui.view">
+        <field name="name">padel.booking.list</field>
+        <field name="model">padel.booking</field>
+        <field name="arch" type="xml">
+            <list decoration-success="state == 'confirmed'" decoration-warning="state == 'pending_payment'" decoration-muted="state == 'cancelled'">
+                <field name="name"/>
+                <field name="calendar_name"/>
+                <field name="start_datetime"/>
+                <field name="end_datetime"/>
+                <field name="duration_minutes"/>
+                <field name="court_id"/>
+                <field name="partner_id"/>
+                <field name="customer_name"/>
+                <field name="state"/>
+                <field name="origin"/>
+                <field name="price"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_padel_booking_calendar" model="ir.ui.view">
+        <field name="name">padel.booking.calendar</field>
+        <field name="model">padel.booking</field>
+        <field name="active">False</field>
+        <field name="arch" type="xml">
+            <calendar string="Planning padel" date_start="start_datetime" date_stop="end_datetime" color="color" mode="day">
+                <field name="calendar_name"/>
+                <field name="color" invisible="1"/>
+                <field name="court_id"/>
+                <field name="partner_id"/>
+                <field name="state"/>
+            </calendar>
+        </field>
+    </record>
+
+    <record id="view_padel_booking_form" model="ir.ui.view">
+        <field name="name">padel.booking.form</field>
+        <field name="model">padel.booking</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_return_to_draft" type="object" string="Volver a borrador" class="btn-secondary" invisible="state == 'draft'"/>
+                    <button name="action_pending_payment" type="object" string="Pendiente de pago" class="btn-secondary" invisible="state not in ['draft']"/>
+                    <button name="action_confirm" type="object" string="Confirmar" class="btn-primary" invisible="state not in ['draft','pending_payment']"/>
+                    <button name="action_open_manual_payment_wizard" type="object" string="Registrar pago TPV" class="btn-primary" invisible="state in ['cancelled','done'] or price &lt;= 0"/>
+                    <button name="action_done" type="object" string="Finalizar" class="btn-secondary" invisible="state not in ['confirmed']"/>
+                    <button name="action_no_show" type="object" string="No presentado" class="btn-secondary" invisible="state not in ['confirmed']"/>
+                    <button name="action_cancel" type="object" string="Cancelar" class="btn-secondary" invisible="state in ['cancelled','done']"/>
+                    <button name="action_open_redsys_refund_warning" type="object" string="Preparar devolución Redsys" class="btn-secondary" invisible="price &lt;= 0 or refund_state in ['requested','done']"/>
+                    <button name="action_open_refund_transaction" type="object" string="Abrir devolución" class="btn-secondary" invisible="not refund_transaction_id"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,pending_payment,confirmed,done,cancelled"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group string="Reserva">
+                            <field name="court_id"/>
+                            <field name="start_datetime"/>
+                            <field name="end_datetime"/>
+                            <field name="duration_minutes" readonly="1"/>
+                            <field name="origin"/>
+                        </group>
+                        <group string="Cliente">
+                            <field name="customer_name"/>
+                            <field name="partner_id"/>
+                            <field name="customer_phone"/>
+                            <field name="customer_email"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Venta y pago">
+                            <field name="price"/>
+                            <field name="payment_deadline"/>
+                            <field name="sale_order_id" readonly="1"/>
+                            <field name="invoice_id" readonly="1"/>
+                            <field name="payment_transaction_id" readonly="1"/>
+                            <field name="manual_payment_id" readonly="1"/>
+                            <field name="manual_pos_order_id" readonly="1"/>
+                            <field name="manual_pos_payment_id" readonly="1"/>
+                        </group>
+                        <group string="Devolucion">
+                            <field name="refund_state" readonly="1"/>
+                            <field name="refund_transaction_id" readonly="1"/>
+                            <field name="refund_credit_note_id" readonly="1"/>
+                            <field name="refund_payment_id" readonly="1"/>
+                            <field name="refunded_amount" readonly="1"/>
+                            <field name="refund_date" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Observaciones">
+                            <field name="note"/>
+                        </page>
+                        <page string="Devolucion">
+                            <field name="refund_message" readonly="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_padel_booking" model="ir.actions.act_window">
+        <field name="name">Reservas</field>
+        <field name="res_model">padel.booking</field>
+        <field name="view_mode">list,form</field>
+        <field name="views" eval="[(ref('view_padel_booking_list'), 'list'), (ref('view_padel_booking_form'), 'form')]"/>
+        <field name="context">{'search_default_today': 1, 'default_state': 'pending_payment'}</field>
+    </record>
+</odoo>

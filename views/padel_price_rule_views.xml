@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_padel_price_rule_list" model="ir.ui.view">
+        <field name="name">padel.price.rule.list</field>
+        <field name="model">padel.price.rule</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="court_scope"/>
+                <field name="court_id" optional="show"/>
+                <field name="weekday_scope"/>
+                <field name="weekday" optional="show"/>
+                <field name="pricing_type"/>
+                <field name="no_light_hour_from" widget="float_time" optional="show"/>
+                <field name="no_light_hour_to" widget="float_time" optional="show"/>
+                <field name="with_light_hour_from" widget="float_time" optional="show"/>
+                <field name="with_light_hour_to" widget="float_time" optional="show"/>
+                <field name="no_light_price_60" optional="show"/>
+                <field name="with_light_price_60" optional="show"/>
+                <field name="no_light_price_90" optional="show"/>
+                <field name="with_light_price_90" optional="show"/>
+                <field name="no_light_price_120" optional="show"/>
+                <field name="with_light_price_120" optional="show"/>
+                <field name="website_available"/>
+                <field name="backend_available" optional="hide"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_padel_price_rule_form" model="ir.ui.view">
+        <field name="name">padel.price.rule.form</field>
+        <field name="model">padel.price.rule</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="sequence"/>
+                            <field name="active"/>
+                        </group>
+                        <group>
+                            <field name="pricing_type"/>
+                            <field name="price" invisible="pricing_type in ['duration_light_table', 'light_split']"/>
+                            <field name="duration_minutes" invisible="pricing_type != 'light_split'"/>
+                            <field name="hour_from" widget="float_time" invisible="pricing_type in ['duration_light_table', 'light_split']"/>
+                            <field name="hour_to" widget="float_time" invisible="pricing_type in ['duration_light_table', 'light_split']"/>
+                            <field name="light_type" invisible="pricing_type != 'hourly_prorated'"/>
+                        </group>
+                    </group>
+
+                    <group string="Horario sin luz / con luz" invisible="pricing_type not in ['duration_light_table', 'light_split']">
+                        <group string="Sin luz">
+                            <field name="no_light_hour_from" widget="float_time"/>
+                            <field name="no_light_hour_to" widget="float_time"/>
+                        </group>
+                        <group string="Con luz">
+                            <field name="with_light_hour_from" widget="float_time"/>
+                            <field name="with_light_hour_to" widget="float_time"/>
+                        </group>
+                    </group>
+
+                    <group string="Precios por duracion" invisible="pricing_type != 'duration_light_table'">
+                        <group string="60 minutos">
+                            <field name="no_light_price_60"/>
+                            <field name="with_light_price_60"/>
+                        </group>
+                        <group string="90 minutos">
+                            <field name="no_light_price_90"/>
+                            <field name="with_light_price_90"/>
+                        </group>
+                        <group string="120 minutos">
+                            <field name="no_light_price_120"/>
+                            <field name="with_light_price_120"/>
+                        </group>
+                    </group>
+
+                    <group string="Precios antiguos por duracion" invisible="pricing_type != 'light_split'">
+                        <group string="Sin luz / con luz">
+                            <field name="no_light_price_hour"/>
+                            <field name="with_light_price_hour"/>
+                        </group>
+                    </group>
+
+                    <group string="Ambito de aplicacion">
+                        <group>
+                            <field name="court_scope"/>
+                            <field name="court_id" invisible="court_scope == 'all'" required="court_scope == 'specific'"/>
+                        </group>
+                        <group>
+                            <field name="weekday_scope"/>
+                            <field name="weekday" invisible="weekday_scope == 'all'" required="weekday_scope == 'specific'"/>
+                        </group>
+                    </group>
+                    <group string="Aplicacion">
+                        <field name="website_available"/>
+                        <field name="backend_available"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_padel_price_rule" model="ir.actions.act_window">
+        <field name="name">Tarifas</field>
+        <field name="res_model">padel.price.rule</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

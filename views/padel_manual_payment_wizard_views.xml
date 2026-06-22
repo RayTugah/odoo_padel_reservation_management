@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_padel_manual_payment_wizard_form" model="ir.ui.view">
+        <field name="name">padel.manual.payment.wizard.form</field>
+        <field name="model">padel.manual.payment.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Registrar pago manual TPV">
+                <group>
+                    <field name="booking_id" readonly="1"/>
+                    <field name="partner_id" readonly="1" placeholder="Si está vacío, se usará Cliente contado padel"/>
+                    <field name="amount"/>
+                    <field name="currency_id" invisible="1"/>
+                    <field name="pos_config_id" options="{'no_create': True}"/>
+                    <field name="pos_session_id" options="{'no_create': True}"/>
+                    <field name="available_pos_payment_method_ids" invisible="1"/>
+                    <field name="pos_payment_method_id" options="{'no_create': True}"/>
+                    <field name="payment_date"/>
+                    <field name="communication"/>
+                </group>
+                <div class="alert alert-info" role="alert">
+                    Este pago se registrará en el Punto de Venta seleccionado para que aparezca en el recuento/cierre de caja.
+                </div>
+                <footer>
+                    <button name="action_register_manual_payment" type="object" string="Registrar pago TPV y factura" class="btn-primary"/>
+                    <button string="Cancelar" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="portal_my_home_padel" name="Portal: card reservas de padel" inherit_id="portal.portal_my_home" customize_show="True" priority="30">
+        <xpath expr="//div[@id='portal_client_category']" position="inside">
+            <t t-call="portal.portal_docs_entry">
+                <t t-set="icon" t-value="'/odoo_padel_reservation_management/static/src/img/padel_reservation.png'"/>
+                <t t-set="title">Reservas de padel</t>
+                <t t-set="text">Consulta o anula tus reservas de padel</t>
+                <t t-set="url" t-value="'/my/padel'"/>
+                <t t-set="placeholder_count" t-value="'padel_booking_count'"/>
+            </t>
+        </xpath>
+    </template>
+
+    <template id="portal_my_padel_bookings" name="Mis reservas de padel">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">Reservas de padel</t>
+            </t>
+
+            <t t-if="padel_success">
+                <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+                    <i class="fa fa-check-circle me-2"/>
+                    <t t-esc="padel_success"/>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"/>
+                </div>
+            </t>
+            <t t-if="padel_error">
+                <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+                    <i class="fa fa-exclamation-circle me-2"/>
+                    <t t-esc="padel_error"/>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"/>
+                </div>
+            </t>
+
+            <div class="mb-3 mt-3">
+                <a href="/padel/reservar" class="btn btn-primary">
+                    <i class="fa fa-plus me-1"/> Nueva reserva
+                </a>
+            </div>
+
+            <t t-if="not bookings">
+                <div class="alert alert-warning mt-3" role="alert">
+                    <i class="fa fa-info-circle me-2"/>
+                    No tienes reservas de padel.
+                </div>
+            </t>
+
+            <t t-if="bookings">
+                <t t-call="portal.portal_table">
+                    <thead>
+                        <tr>
+                            <th>Referencia</th>
+                            <th class="text-center">Fecha y hora</th>
+                            <th class="text-center">Pista</th>
+                            <th class="text-center">Duracion</th>
+                            <th class="text-center">Estado</th>
+                            <th class="text-end">Importe</th>
+                            <th/>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-foreach="bookings" t-as="booking">
+                            <tr>
+                                <td>
+                                    <a t-attf-href="/my/padel/#{booking.id}">
+                                        <t t-esc="booking.name"/>
+                                    </a>
+                                </td>
+                                <td class="text-center">
+                                    <t t-esc="booking.start_datetime" t-options='{"widget": "datetime"}'/>
+                                </td>
+                                <td class="text-center"><t t-esc="booking.court_id.name"/></td>
+                                <td class="text-center"><t t-esc="booking.duration_minutes"/> min</td>
+                                <td class="text-center">
+                                    <span t-attf-class="badge #{
+                                        'bg-warning text-dark' if booking.state == 'pending_payment' else
+                                        'bg-success' if booking.state == 'confirmed' else
+                                        'bg-primary' if booking.state == 'done' else
+                                        'bg-secondary'
+                                    }">
+                                        <t t-if="booking.state == 'pending_payment'">Pendiente de pago</t>
+                                        <t t-elif="booking.state == 'confirmed'">Confirmada</t>
+                                        <t t-elif="booking.state == 'done'">Finalizada</t>
+                                        <t t-elif="booking.state == 'cancelled'">Cancelada</t>
+                                        <t t-else=""><t t-esc="booking.state"/></t>
+                                    </span>
+                                </td>
+                                <td class="text-end"><t t-esc="'%.2f' % (booking.price or 0.0)"/> €</td>
+                                <td class="text-end">
+                                    <a t-attf-href="/my/padel/#{booking.id}" class="btn btn-sm btn-outline-primary">Ver</a>
+                                </td>
+                            </tr>
+                        </t>
+                    </tbody>
+                </t>
+                <div t-if="pager" class="o_portal_pager text-center mt-3">
+                    <t t-call="portal.pager"/>
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <template id="portal_padel_booking_detail" name="Detalle reserva de padel">
+        <t t-call="portal.portal_layout">
+            <t t-if="padel_success">
+                <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+                    <i class="fa fa-check-circle me-2"/>
+                    <t t-esc="padel_success"/>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"/>
+                </div>
+            </t>
+            <t t-if="padel_error">
+                <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+                    <i class="fa fa-exclamation-circle me-2"/>
+                    <t t-esc="padel_error"/>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"/>
+                </div>
+            </t>
+
+            <div class="card mt-3 shadow-sm">
+                <div class="card-header bg-primary text-white d-flex align-items-center justify-content-between">
+                    <span><i class="fa fa-table-tennis-paddle-ball me-2"/><strong><t t-esc="booking.name"/></strong></span>
+                    <span class="badge bg-light text-dark">
+                        <t t-if="booking.state == 'pending_payment'">Pendiente de pago</t>
+                        <t t-elif="booking.state == 'confirmed'">Confirmada</t>
+                        <t t-elif="booking.state == 'done'">Finalizada</t>
+                        <t t-elif="booking.state == 'cancelled'">Cancelada</t>
+                        <t t-else=""><t t-esc="booking.state"/></t>
+                    </span>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <small class="text-muted d-block">Pista</small>
+                            <strong><t t-esc="booking.court_id.name"/></strong>
+                        </div>
+                        <div class="col-md-6">
+                            <small class="text-muted d-block">Cliente</small>
+                            <strong><t t-esc="booking.partner_id.name or booking.customer_name"/></strong>
+                        </div>
+                    </div>
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <small class="text-muted d-block">Inicio</small>
+                            <strong><t t-esc="local_start"/></strong>
+                        </div>
+                        <div class="col-md-4">
+                            <small class="text-muted d-block">Fin</small>
+                            <strong><t t-esc="local_end"/></strong>
+                        </div>
+                        <div class="col-md-4">
+                            <small class="text-muted d-block">Importe</small>
+                            <strong><t t-esc="'%.2f' % (booking.price or 0.0)"/> €</strong>
+                        </div>
+                    </div>
+
+                    <t t-if="booking.state in ('pending_payment', 'confirmed')">
+                        <div class="alert alert-info">
+                            <strong>Devoluciones:</strong> si anulas una reserva pagada, el equipo de administración valorará la devolución de la misma en las próximas horas.
+                            <br/>
+                            Antes de anular, revisa nuestras
+                            <a href="https://campingfuente.odoo.com/knowledge/article/722" target="_blank" class="alert-link">
+                                condiciones de devolución y de reserva del pádel
+                            </a>.
+                        </div>
+                    </t>
+
+                    <t t-if="booking.state in ('pending_payment', 'confirmed')">
+                        <hr/>
+                        <div class="d-flex gap-2 flex-wrap">
+                            <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" t-attf-data-bs-target="#modalCancelPadel#{booking.id}">
+                                <i class="fa fa-times me-1"/> Anular reserva
+                            </button>
+                        </div>
+                        <div class="modal fade" t-attf-id="modalCancelPadel#{booking.id}" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title"><i class="fa fa-exclamation-triangle text-warning me-2"/>Confirmar anulacion</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"/>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p>¿Seguro que quieres anular esta reserva?</p>
+                                        <div class="alert alert-warning">
+                                            <strong>Importante:</strong> la anulación liberará el hueco reservado.
+                                            <br/>
+                                            Si la reserva estaba pagada, el equipo de administración valorará la devolución de la misma en las próximas horas.
+                                            <br/>
+                                            Antes de confirmar, revisa nuestras
+                                            <a href="https://campingfuente.odoo.com/knowledge/article/722" target="_blank" class="alert-link">
+                                                condiciones de devolución y de reserva del pádel
+                                            </a>.
+                                            <div class="mt-2 p-2 bg-white border rounded">
+                                                Número de reserva: <code class="fs-6"><t t-esc="booking.name"/></code>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Volver</button>
+                                        <form t-attf-action="/my/padel/#{booking.id}/cancel" method="post" class="d-inline">
+                                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                            <button type="submit" class="btn btn-danger">Sí, anular reserva</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                    <div class="mt-4">
+                        <a href="/my/padel" class="btn btn-secondary">Volver a mis reservas</a>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <template id="portal_padel_booking_edit" name="Modificar reserva de padel desactivado">
+        <t t-call="portal.portal_layout">
+            <div class="alert alert-info mt-3">
+                La modificacion de reservas desde el portal esta desactivada. Solo puedes anular la reserva y realizar una nueva.
+            </div>
+            <a href="/my/padel" class="btn btn-secondary">Volver a mis reservas</a>
+        </t>
+    </template>
+</odoo>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_padel_court_block_list" model="ir.ui.view">
+        <field name="name">padel.court.block.list</field>
+        <field name="model">padel.court.block</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="court_id"/>
+                <field name="start_datetime"/>
+                <field name="end_datetime"/>
+                <field name="visible_on_website"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_padel_court_block_calendar" model="ir.ui.view">
+        <field name="name">padel.court.block.calendar</field>
+        <field name="model">padel.court.block</field>
+        <field name="arch" type="xml">
+            <calendar string="Bloqueos" date_start="start_datetime" date_stop="end_datetime" color="court_id" mode="week">
+                <field name="name"/>
+                <field name="court_id"/>
+            </calendar>
+        </field>
+    </record>
+
+    <record id="view_padel_court_block_form" model="ir.ui.view">
+        <field name="name">padel.court.block.form</field>
+        <field name="model">padel.court.block</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="court_id"/>
+                            <field name="active"/>
+                        </group>
+                        <group>
+                            <field name="start_datetime"/>
+                            <field name="end_datetime"/>
+                            <field name="visible_on_website"/>
+                        </group>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_padel_court_block" model="ir.actions.act_window">
+        <field name="name">Bloqueos</field>
+        <field name="res_model">padel.court.block</field>
+        <field name="view_mode">calendar,list,form</field>
+    </record>
+</odoo>
